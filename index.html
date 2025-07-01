@@ -1,169 +1,55 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نموذج التفعيل</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Tajawal', sans-serif;
-    }
-    body {
-      margin: 0;
-      background: url('https://media.discordapp.net/attachments/1374388416522879046/1385302519466692639/ec449e3c-002e-49de-be9c-538900fcefcf_-_Copy.png?ex=6862c202&is=68617082&hm=410e834d4bfc75adeab28f4dd1e2e69c0290ff8c6201f473c7528ca1ca173b4e&=&format=webp&quality=lossless&width=1032&height=688') center/cover no-repeat;
-      min-height: 100vh;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .container {
-      width: 90%;
-      max-width: 900px;
-      padding: 30px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 25px;
-      margin-top: 40px;
-      backdrop-filter: blur(8px);
-      animation: fadeInUp 1s;
-    }
-    h2 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 20px;
-    }
-    p {
-      text-align: center;
-      font-size: 1.2em;
-      margin-bottom: 30px;
-      color: #ccc;
-    }
-    textarea, input[type="text"] {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      margin-bottom: 20px;
-      background-color: rgba(255,255,255,0.1);
-      color: white;
-      font-size: 1em;
-      transition: 0.3s;
-    }
-    textarea:focus, input:focus {
-      outline: none;
-      background-color: rgba(255,255,255,0.2);
-    }
-    button {
-      background-color: rgb(99, 0, 0);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 15px;
-      cursor: pointer;
-      font-size: 1.2em;
-      width: 100%;
-      transition: all 0.3s ease;
-    }
-    button:hover {
-      background-color: rgb(73, 0, 0);
-      transform: scale(1.03);
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 6px;
-      color: #eee;
-    }
-    #activationForm { display: none; }
-  </style>
-</head>
-<body>
-  <div class="container animate__animated animate__fadeIn">
-    <div id="welcomeScreen">
-      <h2>مرحبًا بك في نظام التفعيل</h2>
-      <p>قبل أن تبدأ، تأكد من قراءة القوانين والشروط بعناية. اضغط الزر أدناه لبدء الاختبار من خلال الدسكورد.</p>
-      <button onclick="startTest()">بدء الاختبار الآن</button>
+<script>
+  function startTest() {
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("activationForm").style.display = "block";
+  }
 
-      <div style="text-align:center; margin-top: 25px;">
-        <a href="https://discord.gg/3-1" target="_blank" title="انضم إلى ديسكورد">
-          <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord" width="48" height="48" style="filter: drop-shadow(0 0 5px #7289da); transition: 0.3s;" />
-        </a>
-      </div>
-    </div>
+  const webhookURL = "https://discord.com/api/webhooks/1389554778912067625/sM4VSzgXfwL1izg2LUPKcIFj7Q_GEc2ZlA-JD25iGiiTALZylEg8Dqp_uXJONmKkTYCC";
+  let lastSubmitTime = 0; // لحفظ آخر وقت إرسال
 
-    <form id="activationForm">
-      <h2>نموذج التفعيل</h2>
-      <label>اكتب يوزرك دسكورد</label>
-      <input type="text" id="username" name="username" required />
+  document.getElementById("activationForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      <label>هل مسموح xray</label>
-      <textarea name="q1" required></textarea>
-
-      <label>هل مسموح الانفنتوري مود؟</label>
-      <textarea name="q2" required></textarea>
-
-      <label>في حال دخلت فايت هل مسموح التلويت</label>
-      <textarea name="q3" required></textarea>
-
-      <label>عطني سبب يخليك تدخل السيرفر</label>
-      <textarea name="q4" required></textarea>
-
-            <label>اسم حسابك ماين كرافت</label>
-      <textarea name="q5" required></textarea>
-
-      <button type="submit"> إرسال التقديم</button>
-    </form>
-
-    <div id="result" style="text-align:center;margin-top:20px;font-size:1.2em;"></div>
-  </div>
-
-  <script>
-    function startTest() {
-      document.getElementById("welcomeScreen").style.display = "none";
-      document.getElementById("activationForm").style.display = "block";
+    const now = Date.now();
+    if (now - lastSubmitTime < 60000) {
+      document.getElementById("result").innerText = "⏱️ يجب الانتظار دقيقة قبل الإرسال مرة أخرى.";
+      return;
     }
 
-    const webhookURL = "https://discord.com/api/webhooks/1389554778912067625/sM4VSzgXfwL1izg2LUPKcIFj7Q_GEc2ZlA-JD25iGiiTALZylEg8Dqp_uXJONmKkTYCC";
+    const form = new FormData(e.target);
 
-    document.getElementById("activationForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const form = new FormData(e.target);
+    const username = form.get("username");
+    const q1 = form.get("q1");
+    const q2 = form.get("q2");
+    const q3 = form.get("q3");
+    const q4 = form.get("q4");
+    const q5 = form.get("q5");
 
-      const username = form.get("username");
-      const q1 = form.get("q1");
-      const q2 = form.get("q2");
-      const q3 = form.get("q3");
-      const q4 = form.get("q4");
-      const q5 = form.get("q5");
+    const content = `📨 **تقديم تفعيل جديد**\n` +
+      `**يوزر دسكورد :** ${username}\n` +
+      `**هل مسموح xray :** ${q1}\n` +
+      `**هل مسموح الانفنتوري مود؟ :** ${q2}\n` +
+      `**في حال دخلت فايت هل مسموح التلويت :** ${q3}\n` +
+      `**سبب دخول السيرفر :** ${q4}\n` +
+      `**اسم حسابك ماين كرافت :** ${q5}\n` +
+      `🔔 <@&1388533260249989241>`;
 
-      const content = `📨 **تقديم تفعيل جديد**\n` +
-        ` **يوزر دسكورد :** ${username}\n` +
-        `\n**هل مسموح xray :** ${q1}\n` +
-        `**هل مسموح الانفنتوري مود؟ :** ${q2}\n` +
-        `**في حال دخلت فايت هل مسموح التلويت :** ${q3}\n` +
-        `**سبب دخول السيرفر :** ${q4}\n` +
-         `**اسم حسابك ماين كرافت :** ${q5}\n` +
-        `🔔 <@&1388533260249989241>`; // يمكن تغييرها لمنشن رتبة بدل everyone
+    try {
+      const response = await fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ content })
+      });
 
-      try {
-        const response = await fetch(webhookURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ content })
-        });
+      if (!response.ok) throw new Error("فشل الإرسال");
 
-        if (!response.ok) throw new Error("فشل الإرسال");
-
-        e.target.reset();
-        document.getElementById("result").innerText = "✅ تم إرسال التفعيل بنجاح!";
-      } catch (err) {
-        document.getElementById("result").innerText = "❌ حدث خطأ أثناء الإرسال، حاول مرة أخرى.";
-      }
-    });
-  </script>
-</body>
-</html>
+      e.target.reset();
+      lastSubmitTime = now; // حفظ وقت الإرسال
+      document.getElementById("result").innerText = "✅ تم إرسال التفعيل بنجاح!";
+    } catch (err) {
+      document.getElementById("result").innerText = "❌ حدث خطأ أثناء الإرسال، حاول مرة أخرى.";
+    }
+  });
+</script>
